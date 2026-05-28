@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/layout/AppShell";
 import { CourseCard } from "@/components/CourseCard";
+import { CategoryIcon } from "@/components/CategoryIcon";
 
 export const Route = createFileRoute("/categories/$slug")({
   component: CatPage,
