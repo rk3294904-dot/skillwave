@@ -32,7 +32,7 @@ export function TopNav() {
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="rounded-full">
+                <Button variant="ghost" size="icon" className="rounded-full hidden md:inline-flex">
                   <div className="h-8 w-8 rounded-full bg-gradient-primary grid place-items-center text-xs font-semibold text-primary-foreground">
                     {(user.email ?? "?")[0].toUpperCase()}
                   </div>
