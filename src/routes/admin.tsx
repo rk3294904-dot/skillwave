@@ -5,7 +5,7 @@ import { useAuth } from "@/lib/auth";
 import { TopNav } from "@/components/layout/TopNav";
 import { MobileNav } from "@/components/layout/MobileNav";
 
-const tabs = [
+const tabs: ReadonlyArray<{ to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean }> = [
   { to: "/admin", label: "Overview", icon: LayoutDashboard, exact: true },
   { to: "/admin/courses", label: "Courses", icon: BookOpen },
   { to: "/admin/categories", label: "Categories", icon: FolderTree },
@@ -13,7 +13,7 @@ const tabs = [
   { to: "/admin/certificates", label: "Certificates", icon: Award },
   { to: "/admin/reviews", label: "Reviews", icon: MessagesSquare },
   { to: "/admin/settings", label: "Settings", icon: SettingsIcon },
-] as const;
+];
 
 export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [{ title: "Admin — SkillWave" }] }),
