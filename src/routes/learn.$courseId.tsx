@@ -10,7 +10,10 @@ import { VideoEmbed } from "@/components/VideoEmbed";
 import { Button } from "@/components/ui/button";
 import { toEmbedUrl } from "@/lib/embed";
 
-export const Route = createFileRoute("/learn/$courseId")({ component: LearnPage });
+export const Route = createFileRoute("/learn/$courseId")({
+  validateSearch: (s: Record<string, unknown>) => ({ lesson: typeof s.lesson === "string" ? s.lesson : undefined }),
+  component: LearnPage,
+});
 
 function LearnPage() {
   const { courseId } = Route.useParams();
