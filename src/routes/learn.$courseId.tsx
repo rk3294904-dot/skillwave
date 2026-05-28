@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { CheckCircle2, Circle, FileText, Award } from "lucide-react";
@@ -10,14 +10,18 @@ import { VideoEmbed } from "@/components/VideoEmbed";
 import { Button } from "@/components/ui/button";
 import { toEmbedUrl } from "@/lib/embed";
 
-export const Route = createFileRoute("/learn/$courseId")({ component: LearnPage });
+export const Route = createFileRoute("/learn/$courseId")({
+  validateSearch: (s: Record<string, unknown>) => ({ lesson: typeof s.lesson === "string" ? s.lesson : undefined }),
+  component: LearnPage,
+});
 
 function LearnPage() {
   const { courseId } = Route.useParams();
+  const { lesson: lessonParam } = Route.useSearch();
   const { user, loading } = useAuth();
   const nav = useNavigate();
   const qc = useQueryClient();
-  const [activeLesson, setActiveLesson] = useState<string | null>(null);
+  const [activeLesson, setActiveLesson] = useState<string | null>(lessonParam ?? null);
 
   useEffect(() => { if (!loading && !user) nav({ to: "/login" }); }, [user, loading, nav]);
 
@@ -89,7 +93,7 @@ function LearnPage() {
     <AppShell>
       <div className="container mx-auto px-4 py-6 grid gap-6 lg:grid-cols-[1fr_320px]">
         <div className="space-y-4">
-          <Link to="/course/$slug" params={{ slug: "" }} search={{}} className="text-sm text-muted-foreground hover:text-foreground" onClick={(e) => { e.preventDefault(); history.back(); }}>← Back</Link>
+          <button onClick={() => history.back()} className="text-sm text-muted-foreground hover:text-foreground">← Back to course</button>
           <h1 className="text-2xl font-bold">{lesson?.title ?? course.data?.title}</h1>
           {lesson?.video_url ? (
             <VideoEmbed url={lesson.video_url} provider={lesson.video_provider} title={lesson.title} />

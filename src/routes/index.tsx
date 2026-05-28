@@ -4,6 +4,7 @@ import { ArrowRight, Sparkles, Trophy, Zap } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/layout/AppShell";
 import { CourseCard } from "@/components/CourseCard";
+import { CategoryIcon } from "@/components/CategoryIcon";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/")({
@@ -92,10 +93,12 @@ function Home() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {(categories.data ?? []).map((cat) => (
             <Link key={cat.id} to="/categories/$slug" params={{ slug: cat.slug }}
-              className="rounded-xl border border-border bg-card p-5 hover:border-primary/60 hover:shadow-glow transition-all">
-              <div className="text-2xl mb-2">{cat.icon ?? "📚"}</div>
+              className="group rounded-xl border border-border bg-card p-5 hover:border-primary/60 hover:shadow-glow transition-all">
+              <div className="h-10 w-10 rounded-lg bg-primary/10 text-primary grid place-items-center mb-3 group-hover:bg-primary/20 transition-colors">
+                <CategoryIcon name={cat.icon} className="h-5 w-5" />
+              </div>
               <div className="font-semibold">{cat.name}</div>
-              <div className="text-xs text-muted-foreground line-clamp-2">{cat.description}</div>
+              <div className="text-xs text-muted-foreground line-clamp-2 mt-1">{cat.description}</div>
             </Link>
           ))}
         </div>
