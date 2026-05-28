@@ -1,7 +1,8 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { GraduationCap, Search, LogOut, LayoutDashboard, User as UserIcon } from "lucide-react";
+import { Search, LogOut, LayoutDashboard, User as UserIcon } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
+import { Logo } from "@/components/Logo";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
@@ -13,12 +14,7 @@ export function TopNav() {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <Link to="/" className="flex items-center gap-2 font-bold text-lg">
-          <span className="grid h-9 w-9 place-items-center rounded-lg bg-gradient-primary shadow-glow">
-            <GraduationCap className="h-5 w-5 text-primary-foreground" />
-          </span>
-          <span>SkillWave</span>
-        </Link>
+        <Logo />
         <nav className="hidden md:flex items-center gap-6 text-sm text-muted-foreground">
           <Link to="/courses" className="hover:text-foreground transition-colors">Courses</Link>
           <Link to="/categories" className="hover:text-foreground transition-colors">Categories</Link>

@@ -193,6 +193,7 @@ export type Database = {
           is_featured: boolean
           is_popular: boolean
           is_published: boolean
+          lectures_complete: boolean
           price: number | null
           rating: number | null
           short_description: string | null
@@ -214,6 +215,7 @@ export type Database = {
           is_featured?: boolean
           is_popular?: boolean
           is_published?: boolean
+          lectures_complete?: boolean
           price?: number | null
           rating?: number | null
           short_description?: string | null
@@ -235,6 +237,7 @@ export type Database = {
           is_featured?: boolean
           is_popular?: boolean
           is_published?: boolean
+          lectures_complete?: boolean
           price?: number | null
           rating?: number | null
           short_description?: string | null

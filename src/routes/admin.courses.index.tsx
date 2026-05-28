@@ -18,7 +18,8 @@ const empty = {
   title: "", slug: "", short_description: "", description: "",
   thumbnail_url: "", category_id: "", difficulty: "beginner" as const,
   price: 0, duration_minutes: 0, instructor_name: "",
-  is_published: false, is_featured: false, is_popular: false, skills: [] as string[],
+  is_published: false, is_featured: false, is_popular: false,
+  lectures_complete: false, skills: [] as string[],
 };
 
 function AdminCourses() {
@@ -100,10 +101,11 @@ function AdminCourses() {
                 <div><Label>Instructor</Label><Input value={form.instructor_name ?? ""} onChange={(e) => setForm({ ...form, instructor_name: e.target.value })} /></div>
               </div>
               <div><Label>Skills (comma-separated)</Label><Input value={skillsTxt} onChange={(e) => setSkillsTxt(e.target.value)} /></div>
-              <div className="flex gap-6 pt-2 text-sm">
+              <div className="flex flex-wrap gap-6 pt-2 text-sm">
                 <label className="flex items-center gap-2"><Switch checked={form.is_published} onCheckedChange={(v) => setForm({ ...form, is_published: v })} /> Published</label>
                 <label className="flex items-center gap-2"><Switch checked={form.is_featured} onCheckedChange={(v) => setForm({ ...form, is_featured: v })} /> Featured</label>
                 <label className="flex items-center gap-2"><Switch checked={form.is_popular} onCheckedChange={(v) => setForm({ ...form, is_popular: v })} /> Popular</label>
+                <label className="flex items-center gap-2"><Switch checked={!!form.lectures_complete} onCheckedChange={(v) => setForm({ ...form, lectures_complete: v })} /> All lectures uploaded</label>
               </div>
               <div className="flex justify-end gap-2 pt-3">
                 <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>

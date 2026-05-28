@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import { CheckCircle2, Circle, FileText, Award } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { CheckCircle2, Circle, FileText, Award, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
@@ -22,6 +22,7 @@ function LearnPage() {
   const nav = useNavigate();
   const qc = useQueryClient();
   const [activeLesson, setActiveLesson] = useState<string | null>(lessonParam ?? null);
+  const autoIssuedRef = useRef(false);
 
   useEffect(() => { if (!loading && !user) nav({ to: "/login" }); }, [user, loading, nav]);
 
@@ -42,6 +43,12 @@ function LearnPage() {
       return { modules: mods ?? [], lessons: lessons ?? [], enrollment: enroll, progress: progress ?? [] };
     },
   });
+  const cert = useQuery({
+    queryKey: ["learn-cert", courseId, user?.id],
+    enabled: !!user,
+    queryFn: async () =>
+      (await supabase.from("certificates").select("id").eq("course_id", courseId).eq("user_id", user!.id).maybeSingle()).data,
+  });
 
   useEffect(() => {
     if (!activeLesson && data.data?.lessons.length) {
@@ -54,6 +61,7 @@ function LearnPage() {
   const total = data.data?.lessons.length ?? 0;
   const done = completedIds.size;
   const pct = total ? Math.round((done / total) * 100) : 0;
+  const lecturesComplete = !!(course.data as any)?.lectures_complete;
 
   const markDone = useMutation({
     mutationFn: async () => {
@@ -71,8 +79,11 @@ function LearnPage() {
   });
 
   const issueCert = useMutation({
-    mutationFn: async () => {
-      if (!user || !course.data) return;
+    mutationFn: async (opts?: { silent?: boolean }) => {
+      if (!user || !course.data) return { silent: opts?.silent };
+      // idempotent guard
+      const { data: existing } = await supabase.from("certificates").select("id").eq("course_id", course.data.id).eq("user_id", user.id).maybeSingle();
+      if (existing) return { silent: opts?.silent, already: true };
       const { data: prof } = await supabase.from("profiles").select("display_name").eq("user_id", user.id).maybeSingle();
       const { error } = await supabase.from("certificates").insert({
         user_id: user.id, course_id: course.data.id,
@@ -80,10 +91,29 @@ function LearnPage() {
         student_name: prof?.display_name ?? user.email ?? "Student",
       });
       if (error) throw error;
+      return { silent: opts?.silent };
     },
-    onSuccess: () => { toast.success("Certificate issued!"); nav({ to: "/certificates" }); },
+    onSuccess: (res) => {
+      qc.invalidateQueries({ queryKey: ["learn-cert"] });
+      if (res?.silent) {
+        if (!res.already) toast.success("🎉 Course completed — certificate issued!");
+      } else {
+        toast.success("Certificate issued!");
+        nav({ to: "/certificates" });
+      }
+    },
     onError: (e: Error) => toast.error(e.message),
   });
+
+  // Auto-issue certificate when student finishes all lessons AND admin has marked lectures complete
+  useEffect(() => {
+    if (autoIssuedRef.current) return;
+    if (!user || !course.data || cert.isLoading) return;
+    if (pct >= 100 && lecturesComplete && !cert.data) {
+      autoIssuedRef.current = true;
+      issueCert.mutate({ silent: true });
+    }
+  }, [pct, lecturesComplete, cert.data, cert.isLoading, user, course.data]);
 
   if (loading || data.isLoading) return <AppShell><div className="p-10">Loading…</div></AppShell>;
 
@@ -119,14 +149,24 @@ function LearnPage() {
               </div>
             </div>
           )}
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-3 items-center">
             <Button onClick={() => markDone.mutate()} disabled={!lesson || completedIds.has(lesson.id)}>
               {lesson && completedIds.has(lesson.id) ? "Completed" : "Mark as complete"}
             </Button>
-            {pct >= 100 && (
-              <Button variant="outline" onClick={() => issueCert.mutate()}>
+            {pct >= 100 && cert.data && (
+              <Button variant="outline" onClick={() => nav({ to: "/certificates" })}>
+                <Award className="h-4 w-4 mr-1" /> View certificate
+              </Button>
+            )}
+            {pct >= 100 && !cert.data && lecturesComplete && (
+              <Button variant="outline" onClick={() => issueCert.mutate(undefined)} disabled={issueCert.isPending}>
                 <Award className="h-4 w-4 mr-1" /> Get certificate
               </Button>
+            )}
+            {pct >= 100 && !lecturesComplete && (
+              <div className="text-xs text-muted-foreground flex items-center gap-1">
+                <Lock className="h-3 w-3" /> Certificate unlocks once admin marks all lectures uploaded.
+              </div>
             )}
           </div>
         </div>
