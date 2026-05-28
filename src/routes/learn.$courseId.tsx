@@ -17,10 +17,11 @@ export const Route = createFileRoute("/learn/$courseId")({
 
 function LearnPage() {
   const { courseId } = Route.useParams();
+  const { lesson: lessonParam } = Route.useSearch();
   const { user, loading } = useAuth();
   const nav = useNavigate();
   const qc = useQueryClient();
-  const [activeLesson, setActiveLesson] = useState<string | null>(null);
+  const [activeLesson, setActiveLesson] = useState<string | null>(lessonParam ?? null);
 
   useEffect(() => { if (!loading && !user) nav({ to: "/login" }); }, [user, loading, nav]);
 
