@@ -45,7 +45,7 @@ function AdminLayout() {
                 const active = t.exact ? path === t.to : path.startsWith(t.to);
                 return (
                   <li key={t.to}>
-                    <Link to={t.to} className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm ${active ? "bg-gradient-primary text-primary-foreground" : "hover:bg-accent"}`}>
+                    <Link to={t.to as any} className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm ${active ? "bg-gradient-primary text-primary-foreground" : "hover:bg-accent"}`}>
                       <t.icon className="h-4 w-4" />{t.label}
                     </Link>
                   </li>
