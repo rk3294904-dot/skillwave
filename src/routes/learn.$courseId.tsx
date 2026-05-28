@@ -93,7 +93,7 @@ function LearnPage() {
     <AppShell>
       <div className="container mx-auto px-4 py-6 grid gap-6 lg:grid-cols-[1fr_320px]">
         <div className="space-y-4">
-          <Link to="/course/$slug" params={{ slug: "" }} search={{}} className="text-sm text-muted-foreground hover:text-foreground" onClick={(e) => { e.preventDefault(); history.back(); }}>← Back</Link>
+          <button onClick={() => history.back()} className="text-sm text-muted-foreground hover:text-foreground">← Back to course</button>
           <h1 className="text-2xl font-bold">{lesson?.title ?? course.data?.title}</h1>
           {lesson?.video_url ? (
             <VideoEmbed url={lesson.video_url} provider={lesson.video_provider} title={lesson.title} />
