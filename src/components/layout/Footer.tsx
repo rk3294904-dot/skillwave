@@ -1,10 +1,11 @@
 import { Link } from "@tanstack/react-router";
+import { Logo } from "@/components/Logo";
 export function Footer() {
   return (
     <footer className="hidden md:block border-t border-border/60 mt-24">
       <div className="container mx-auto px-4 py-10 grid gap-6 md:grid-cols-4 text-sm">
         <div>
-          <div className="font-bold text-lg mb-2">SkillWave</div>
+          <Logo className="mb-3" />
           <p className="text-muted-foreground">Learn in-demand skills from world-class instructors.</p>
         </div>
         <div>
