@@ -4,6 +4,7 @@ import { ArrowRight, Sparkles, Trophy, Zap } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/layout/AppShell";
 import { CourseCard } from "@/components/CourseCard";
+import { CategoryIcon } from "@/components/CategoryIcon";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/")({
