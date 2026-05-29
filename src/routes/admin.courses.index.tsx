@@ -24,7 +24,7 @@ const empty = {
 
 function AdminCourses() {
   const qc = useQueryClient();
-  const courses = useQuery({ queryKey: ["admin-courses"], queryFn: async () => (await supabase.from("courses").select("*, categories(name)").order("created_at", { ascending: false })).data ?? [] });
+  const courses = useQuery({ queryKey: ["admin-courses"], queryFn: async () => (await supabase.from("courses").select("*").order("created_at", { ascending: false })).data ?? [] });
   const cats = useQuery({ queryKey: ["admin-cats"], queryFn: async () => (await supabase.from("categories").select("*").order("display_order")).data ?? [] });
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<any>(null);
@@ -120,7 +120,7 @@ function AdminCourses() {
           <div key={c.id} className="p-4 flex items-center justify-between gap-3">
             <div className="min-w-0">
               <div className="font-semibold truncate">{c.title}</div>
-              <div className="text-xs text-muted-foreground">{c.categories?.name ?? "—"} · {c.is_published ? "Published" : "Draft"} · {c.enrollment_count} enrolled</div>
+              <div className="text-xs text-muted-foreground">{cats.data?.find((x: any) => x.id === c.category_id)?.name ?? "—"} · {c.is_published ? "Published" : "Draft"} · {c.enrollment_count} enrolled</div>
             </div>
             <div className="flex gap-2 shrink-0">
               <Button asChild size="sm" variant="outline"><Link to="/admin/courses/$id" params={{ id: c.id }}>Curriculum</Link></Button>
