@@ -302,6 +302,93 @@ export type Database = {
           },
         ]
       }
+      lesson_bookmarks: {
+        Row: {
+          course_id: string
+          created_at: string
+          id: string
+          lesson_id: string
+          user_id: string
+        }
+        Insert: {
+          course_id: string
+          created_at?: string
+          id?: string
+          lesson_id: string
+          user_id: string
+        }
+        Update: {
+          course_id?: string
+          created_at?: string
+          id?: string
+          lesson_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      lesson_comments: {
+        Row: {
+          content: string
+          course_id: string
+          created_at: string
+          id: string
+          lesson_id: string
+          parent_id: string | null
+          user_id: string
+        }
+        Insert: {
+          content: string
+          course_id: string
+          created_at?: string
+          id?: string
+          lesson_id: string
+          parent_id?: string | null
+          user_id: string
+        }
+        Update: {
+          content?: string
+          course_id?: string
+          created_at?: string
+          id?: string
+          lesson_id?: string
+          parent_id?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      lesson_notes: {
+        Row: {
+          content: string
+          course_id: string
+          created_at: string
+          id: string
+          lesson_id: string
+          timestamp_seconds: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          course_id: string
+          created_at?: string
+          id?: string
+          lesson_id: string
+          timestamp_seconds?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          course_id?: string
+          created_at?: string
+          id?: string
+          lesson_id?: string
+          timestamp_seconds?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       lesson_progress: {
         Row: {
           completed: boolean
@@ -344,6 +431,36 @@ export type Database = {
           },
         ]
       }
+      lesson_quizzes: {
+        Row: {
+          course_id: string
+          created_at: string
+          id: string
+          lesson_id: string
+          pass_percent: number
+          questions: Json
+          title: string
+        }
+        Insert: {
+          course_id: string
+          created_at?: string
+          id?: string
+          lesson_id: string
+          pass_percent?: number
+          questions?: Json
+          title?: string
+        }
+        Update: {
+          course_id?: string
+          created_at?: string
+          id?: string
+          lesson_id?: string
+          pass_percent?: number
+          questions?: Json
+          title?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -385,6 +502,39 @@ export type Database = {
           learning_goal?: string | null
           onboarded?: boolean
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      quiz_attempts: {
+        Row: {
+          answers: Json | null
+          created_at: string
+          id: string
+          lesson_id: string
+          passed: boolean
+          quiz_id: string
+          score_percent: number
+          user_id: string
+        }
+        Insert: {
+          answers?: Json | null
+          created_at?: string
+          id?: string
+          lesson_id: string
+          passed?: boolean
+          quiz_id: string
+          score_percent: number
+          user_id: string
+        }
+        Update: {
+          answers?: Json | null
+          created_at?: string
+          id?: string
+          lesson_id?: string
+          passed?: boolean
+          quiz_id?: string
+          score_percent?: number
           user_id?: string
         }
         Relationships: []
@@ -463,11 +613,42 @@ export type Database = {
         }
         Relationships: []
       }
+      user_stats: {
+        Row: {
+          current_streak: number
+          last_active_date: string | null
+          longest_streak: number
+          updated_at: string
+          user_id: string
+          xp: number
+        }
+        Insert: {
+          current_streak?: number
+          last_active_date?: string | null
+          longest_streak?: number
+          updated_at?: string
+          user_id: string
+          xp?: number
+        }
+        Update: {
+          current_streak?: number
+          last_active_date?: string | null
+          longest_streak?: number
+          updated_at?: string
+          user_id?: string
+          xp?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      bump_user_activity: {
+        Args: { _user_id: string; _xp_delta: number }
+        Returns: undefined
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

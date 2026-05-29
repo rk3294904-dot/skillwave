@@ -9,6 +9,7 @@ import { AppShell } from "@/components/layout/AppShell";
 import { VideoEmbed } from "@/components/VideoEmbed";
 import { Button } from "@/components/ui/button";
 import { toEmbedUrl } from "@/lib/embed";
+import { LessonTabs } from "@/components/learn/LessonTabs";
 
 export const Route = createFileRoute("/learn/$courseId")({
   validateSearch: (s: Record<string, unknown>) => ({ lesson: typeof s.lesson === "string" ? s.lesson : undefined }),
@@ -74,8 +75,13 @@ function LearnPage() {
         last_lesson_id: lesson.id,
         completed_at: done + 1 >= total ? new Date().toISOString() : null,
       }).eq("user_id", user.id).eq("course_id", courseId);
+      await supabase.rpc("bump_user_activity", { _user_id: user.id, _xp_delta: 10 });
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["learn-data"] }); toast.success("Progress saved"); },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["learn-data"] });
+      qc.invalidateQueries({ queryKey: ["user-stats"] });
+      toast.success("+10 XP · Progress saved");
+    },
   });
 
   const issueCert = useMutation({
@@ -169,6 +175,9 @@ function LearnPage() {
               </div>
             )}
           </div>
+          {user && lesson && (
+            <LessonTabs courseId={courseId} lessonId={lesson.id} userId={user.id} />
+          )}
         </div>
         <aside className="rounded-xl border border-border bg-card p-4 space-y-3 h-fit lg:sticky lg:top-20">
           <div>

@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Plus, Trash2, Pencil } from "lucide-react";
+import { Plus, Trash2, Pencil, Brain } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -83,6 +83,36 @@ function CurriculumEditor() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["curriculum", id] }),
   });
 
+  const [quizOpen, setQuizOpen] = useState(false);
+  const [quizLesson, setQuizLesson] = useState<string | null>(null);
+  const [quizForm, setQuizForm] = useState<{ pass_percent: number; questions_json: string }>({ pass_percent: 70, questions_json: "[]" });
+
+  const openQuiz = async (lessonId: string) => {
+    setQuizLesson(lessonId);
+    const { data: q } = await supabase.from("lesson_quizzes").select("*").eq("lesson_id", lessonId).maybeSingle();
+    setQuizForm({
+      pass_percent: q?.pass_percent ?? 70,
+      questions_json: JSON.stringify(q?.questions ?? [{ q: "Sample question?", options: ["A", "B", "C", "D"], answer: 0 }], null, 2),
+    });
+    setQuizOpen(true);
+  };
+
+  const saveQuiz = useMutation({
+    mutationFn: async () => {
+      if (!quizLesson) return;
+      let questions: any;
+      try { questions = JSON.parse(quizForm.questions_json); } catch { throw new Error("Invalid questions JSON"); }
+      const { error } = await supabase.from("lesson_quizzes").upsert({
+        lesson_id: quizLesson, course_id: id,
+        pass_percent: Number(quizForm.pass_percent) || 70,
+        questions,
+      }, { onConflict: "lesson_id" } as any);
+      if (error) throw error;
+    },
+    onSuccess: () => { toast.success("Quiz saved"); setQuizOpen(false); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   return (
     <div className="space-y-4">
       <Link to="/admin/courses" className="text-sm text-muted-foreground hover:text-foreground">← Back to courses</Link>
@@ -105,6 +135,7 @@ function CurriculumEditor() {
                 <li key={l.id} className="p-3 flex items-center justify-between text-sm">
                   <span className="truncate">{l.title} <span className="text-muted-foreground">· {l.duration_minutes}m {l.is_preview && "· Preview"}</span></span>
                   <div className="flex gap-2">
+                    <Button size="icon" variant="ghost" onClick={() => openQuiz(l.id)} title="Edit quiz"><Brain className="h-4 w-4" /></Button>
                     <Button size="icon" variant="ghost" onClick={() => openLesson(m.id, l)}><Pencil className="h-4 w-4" /></Button>
                     <Button size="icon" variant="ghost" onClick={() => { if (confirm("Delete lesson?")) delLesson.mutate(l.id); }}><Trash2 className="h-4 w-4" /></Button>
                   </div>
@@ -140,6 +171,23 @@ function CurriculumEditor() {
             <div><Label>Content / notes</Label><Textarea rows={4} value={lf.content ?? ""} onChange={(e) => setLf({ ...lf, content: e.target.value })} /></div>
             <div><Label>Resources JSON — [{`{"title":"Slides","url":"https://..."}`}]</Label><Textarea rows={4} value={lf.resources_json} onChange={(e) => setLf({ ...lf, resources_json: e.target.value })} /></div>
             <div className="flex justify-end gap-2"><Button variant="outline" onClick={() => setLessonOpen(false)}>Cancel</Button><Button className="bg-gradient-primary" onClick={() => saveLesson.mutate()} disabled={saveLesson.isPending}>Save</Button></div>
+          </div>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={quizOpen} onOpenChange={setQuizOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader><DialogTitle>Lesson quiz</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <div><Label>Pass percent</Label><Input type="number" value={quizForm.pass_percent} onChange={(e) => setQuizForm({ ...quizForm, pass_percent: Number(e.target.value) })} /></div>
+            <div>
+              <Label>Questions JSON</Label>
+              <p className="text-xs text-muted-foreground mb-1">{`Format: [{"q":"...","options":["A","B","C","D"],"answer":0}]`}</p>
+              <Textarea rows={14} className="font-mono text-xs" value={quizForm.questions_json} onChange={(e) => setQuizForm({ ...quizForm, questions_json: e.target.value })} />
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setQuizOpen(false)}>Cancel</Button>
+              <Button className="bg-gradient-primary" onClick={() => saveQuiz.mutate()} disabled={saveQuiz.isPending}>Save quiz</Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
