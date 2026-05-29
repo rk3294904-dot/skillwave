@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Plus, Trash2, Pencil } from "lucide-react";
+import { Plus, Trash2, Pencil, Brain } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -81,6 +81,36 @@ function CurriculumEditor() {
   const delLesson = useMutation({
     mutationFn: async (lid: string) => { const { error } = await supabase.from("course_lessons").delete().eq("id", lid); if (error) throw error; },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["curriculum", id] }),
+  });
+
+  const [quizOpen, setQuizOpen] = useState(false);
+  const [quizLesson, setQuizLesson] = useState<string | null>(null);
+  const [quizForm, setQuizForm] = useState<{ pass_percent: number; questions_json: string }>({ pass_percent: 70, questions_json: "[]" });
+
+  const openQuiz = async (lessonId: string) => {
+    setQuizLesson(lessonId);
+    const { data: q } = await supabase.from("lesson_quizzes").select("*").eq("lesson_id", lessonId).maybeSingle();
+    setQuizForm({
+      pass_percent: q?.pass_percent ?? 70,
+      questions_json: JSON.stringify(q?.questions ?? [{ q: "Sample question?", options: ["A", "B", "C", "D"], answer: 0 }], null, 2),
+    });
+    setQuizOpen(true);
+  };
+
+  const saveQuiz = useMutation({
+    mutationFn: async () => {
+      if (!quizLesson) return;
+      let questions: any;
+      try { questions = JSON.parse(quizForm.questions_json); } catch { throw new Error("Invalid questions JSON"); }
+      const { error } = await supabase.from("lesson_quizzes").upsert({
+        lesson_id: quizLesson, course_id: id,
+        pass_percent: Number(quizForm.pass_percent) || 70,
+        questions,
+      }, { onConflict: "lesson_id" } as any);
+      if (error) throw error;
+    },
+    onSuccess: () => { toast.success("Quiz saved"); setQuizOpen(false); },
+    onError: (e: Error) => toast.error(e.message),
   });
 
   return (
