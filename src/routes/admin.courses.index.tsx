@@ -24,7 +24,7 @@ const empty = {
 
 function AdminCourses() {
   const qc = useQueryClient();
-  const courses = useQuery({ queryKey: ["admin-courses"], queryFn: async () => (await supabase.from("courses").select("*, categories(name)").order("created_at", { ascending: false })).data ?? [] });
+  const courses = useQuery({ queryKey: ["admin-courses"], queryFn: async () => (await supabase.from("courses").select("*").order("created_at", { ascending: false })).data ?? [] });
   const cats = useQuery({ queryKey: ["admin-cats"], queryFn: async () => (await supabase.from("categories").select("*").order("display_order")).data ?? [] });
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<any>(null);
