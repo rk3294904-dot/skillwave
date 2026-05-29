@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import {
   BookOpen, Award, Settings as SettingsIcon, LayoutDashboard, LogOut,
-  ChevronRight, Mail, Shield, Pencil, GraduationCap, Sparkles,
+  ChevronRight, Mail, Shield, Pencil, GraduationCap, Sparkles, Flame, Zap,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -50,6 +50,12 @@ function Profile() {
       const completed = (enrolls ?? []).filter((e) => e.completed_at).length;
       return { enrolled: enrolled ?? 0, certs: certs ?? 0, completed };
     },
+  });
+
+  const userStats = useQuery({
+    queryKey: ["user-stats", user?.id],
+    enabled: !!user,
+    queryFn: async () => (await supabase.from("user_stats").select("*").eq("user_id", user!.id).maybeSingle()).data,
   });
 
   const [form, setForm] = useState({ display_name: "", bio: "", avatar_url: "", learning_goal: "" });
@@ -142,6 +148,33 @@ function Profile() {
               <div className="text-[11px] uppercase tracking-wide text-muted-foreground">{s.label}</div>
             </div>
           ))}
+        </section>
+
+        {/* Streak & XP */}
+        <section className="rounded-2xl border border-border bg-gradient-to-br from-indigo-500/10 via-fuchsia-500/5 to-cyan-400/10 p-5">
+          <div className="grid grid-cols-3 gap-4">
+            <div className="flex items-center gap-2">
+              <div className="h-10 w-10 rounded-lg bg-orange-500/15 text-orange-400 grid place-items-center"><Flame className="h-5 w-5" /></div>
+              <div>
+                <div className="text-xl font-bold">{userStats.data?.current_streak ?? 0}</div>
+                <div className="text-[10px] uppercase text-muted-foreground tracking-wide">Day streak</div>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="h-10 w-10 rounded-lg bg-cyan-500/15 text-cyan-300 grid place-items-center"><Zap className="h-5 w-5" /></div>
+              <div>
+                <div className="text-xl font-bold">{userStats.data?.xp ?? 0}</div>
+                <div className="text-[10px] uppercase text-muted-foreground tracking-wide">Total XP</div>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="h-10 w-10 rounded-lg bg-fuchsia-500/15 text-fuchsia-300 grid place-items-center"><Award className="h-5 w-5" /></div>
+              <div>
+                <div className="text-xl font-bold">{userStats.data?.longest_streak ?? 0}</div>
+                <div className="text-[10px] uppercase text-muted-foreground tracking-wide">Best streak</div>
+              </div>
+            </div>
+          </div>
         </section>
 
         {/* Menu */}
