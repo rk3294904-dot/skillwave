@@ -7,15 +7,13 @@
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 export default defineConfig({
+  // Cloudflare's TanStack setup scans vite.config.ts for a top-level
+  // `plugins` array before it can apply its deployment wiring.
+  // Keep this empty: @lovable.dev/vite-tanstack-config injects the real plugins.
+  plugins: [],
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this
     server: { entry: "server" },
-  },
-  // Explicit (empty) plugins array so Cloudflare Wrangler's deploy-time
-  // Vite-config detector finds a plugins entry. All real plugins are still
-  // injected by @lovable.dev/vite-tanstack-config — do not add any here.
-  vite: {
-    plugins: [],
   },
 });
