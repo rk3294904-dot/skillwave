@@ -12,4 +12,10 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  // Explicit (empty) plugins array so Cloudflare Wrangler's deploy-time
+  // Vite-config detector finds a plugins entry. All real plugins are still
+  // injected by @lovable.dev/vite-tanstack-config — do not add any here.
+  vite: {
+    plugins: [],
+  },
 });
