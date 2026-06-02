@@ -6,6 +6,7 @@ import {
 import appCss from "../styles.css?url";
 import { AuthProvider } from "@/lib/auth";
 import { Toaster } from "@/components/ui/sonner";
+import { DailyGoalReminder } from "@/components/DailyGoalReminder";
 
 function NotFoundComponent() {
   return (
@@ -71,6 +72,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <Outlet />
+        <DailyGoalReminder />
         <Toaster />
       </AuthProvider>
     </QueryClientProvider>

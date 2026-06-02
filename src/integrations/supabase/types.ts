@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      achievements: {
+        Row: {
+          description: string
+          display_order: number
+          icon: string
+          id: string
+          kind: string
+          threshold: number | null
+          title: string
+          xp_reward: number
+        }
+        Insert: {
+          description: string
+          display_order?: number
+          icon?: string
+          id: string
+          kind: string
+          threshold?: number | null
+          title: string
+          xp_reward?: number
+        }
+        Update: {
+          description?: string
+          display_order?: number
+          icon?: string
+          id?: string
+          kind?: string
+          threshold?: number | null
+          title?: string
+          xp_reward?: number
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           created_at: string
@@ -389,6 +422,36 @@ export type Database = {
         }
         Relationships: []
       }
+      lesson_playback: {
+        Row: {
+          course_id: string
+          duration_seconds: number
+          id: string
+          lesson_id: string
+          position_seconds: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          course_id: string
+          duration_seconds?: number
+          id?: string
+          lesson_id: string
+          position_seconds?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          course_id?: string
+          duration_seconds?: number
+          id?: string
+          lesson_id?: string
+          position_seconds?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       lesson_progress: {
         Row: {
           completed: boolean
@@ -466,6 +529,7 @@ export type Database = {
           avatar_url: string | null
           bio: string | null
           created_at: string
+          daily_goal_minutes: number
           display_name: string | null
           email: string | null
           experience_level: string | null
@@ -480,6 +544,7 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           created_at?: string
+          daily_goal_minutes?: number
           display_name?: string | null
           email?: string | null
           experience_level?: string | null
@@ -494,6 +559,7 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           created_at?: string
+          daily_goal_minutes?: number
           display_name?: string | null
           email?: string | null
           experience_level?: string | null
@@ -592,6 +658,35 @@ export type Database = {
         }
         Relationships: []
       }
+      user_achievements: {
+        Row: {
+          achievement_id: string
+          id: string
+          unlocked_at: string
+          user_id: string
+        }
+        Insert: {
+          achievement_id: string
+          id?: string
+          unlocked_at?: string
+          user_id: string
+        }
+        Update: {
+          achievement_id?: string
+          id?: string
+          unlocked_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_achievements_achievement_id_fkey"
+            columns: ["achievement_id"]
+            isOneToOne: false
+            referencedRelation: "achievements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -637,6 +732,30 @@ export type Database = {
           updated_at?: string
           user_id?: string
           xp?: number
+        }
+        Relationships: []
+      }
+      xp_events: {
+        Row: {
+          created_at: string
+          delta: number
+          id: string
+          source: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          delta: number
+          id?: string
+          source: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          delta?: number
+          id?: string
+          source?: string
+          user_id?: string
         }
         Relationships: []
       }

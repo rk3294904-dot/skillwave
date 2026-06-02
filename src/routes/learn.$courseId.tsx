@@ -6,10 +6,11 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { AppShell } from "@/components/layout/AppShell";
-import { VideoEmbed } from "@/components/VideoEmbed";
+import { SmartVideoPlayer } from "@/components/SmartVideoPlayer";
 import { Button } from "@/components/ui/button";
 import { toEmbedUrl } from "@/lib/embed";
 import { LessonTabs } from "@/components/learn/LessonTabs";
+import { checkAchievements } from "@/lib/gamification";
 
 export const Route = createFileRoute("/learn/$courseId")({
   validateSearch: (s: Record<string, unknown>) => ({ lesson: typeof s.lesson === "string" ? s.lesson : undefined }),
@@ -81,6 +82,7 @@ function LearnPage() {
       qc.invalidateQueries({ queryKey: ["learn-data"] });
       qc.invalidateQueries({ queryKey: ["user-stats"] });
       toast.success("+10 XP · Progress saved");
+      if (user) checkAchievements(user.id);
     },
   });
 
@@ -132,7 +134,7 @@ function LearnPage() {
           <button onClick={() => history.back()} className="text-sm text-muted-foreground hover:text-foreground">← Back to course</button>
           <h1 className="text-2xl font-bold">{lesson?.title ?? course.data?.title}</h1>
           {lesson?.video_url ? (
-            <VideoEmbed url={lesson.video_url} provider={lesson.video_provider} title={lesson.title} />
+            <SmartVideoPlayer url={lesson.video_url} provider={lesson.video_provider} title={lesson.title} userId={user?.id ?? null} courseId={courseId} lessonId={lesson.id} />
           ) : (
             <div className="aspect-video rounded-lg bg-muted grid place-items-center text-muted-foreground">Select a lesson</div>
           )}

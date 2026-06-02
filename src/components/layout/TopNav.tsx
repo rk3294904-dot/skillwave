@@ -3,6 +3,7 @@ import { Search, LogOut, LayoutDashboard, User as UserIcon } from "lucide-react"
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/Logo";
+import { StreakChip } from "@/components/StreakChip";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
@@ -22,6 +23,7 @@ export function TopNav() {
           <Link to="/about" className="hover:text-foreground transition-colors">About</Link>
         </nav>
         <div className="flex items-center gap-2">
+          <StreakChip />
           <Button variant="ghost" size="icon" onClick={() => nav({ to: "/search" })} aria-label="Search">
             <Search className="h-5 w-5" />
           </Button>
@@ -42,6 +44,8 @@ export function TopNav() {
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => nav({ to: "/my-learning" })}>My Learning</DropdownMenuItem>
                 <DropdownMenuItem onClick={() => nav({ to: "/certificates" })}>Certificates</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => nav({ to: "/achievements" })}>Achievements</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => nav({ to: "/leaderboard" })}>Leaderboard</DropdownMenuItem>
                 <DropdownMenuItem onClick={() => nav({ to: "/settings" })}>Settings</DropdownMenuItem>
                 {isAdmin && (
                   <>

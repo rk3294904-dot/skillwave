@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { checkAchievements } from "@/lib/gamification";
 
 type Props = { courseId: string; lessonId: string; userId: string };
 
@@ -178,6 +179,7 @@ function QuizTab({ courseId, lessonId, userId }: Props) {
       qc.invalidateQueries({ queryKey: ["quiz-attempt", lessonId] });
       qc.invalidateQueries({ queryKey: ["user-stats"] });
       r.passed ? toast.success(`Passed! +25 XP`) : toast.error(`Score ${r.score}% — try again`);
+      if (r.passed) checkAchievements(userId);
     },
   });
   const questions = (quiz.data?.questions as unknown as Question[]) ?? [];
