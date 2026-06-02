@@ -123,12 +123,13 @@ export function SmartVideoPlayer({ url, provider, title, userId, courseId, lesso
   return (
     <div className="space-y-2">
       <div className="aspect-video w-full overflow-hidden rounded-lg border border-border bg-black shadow-glow">
-        <div ref={containerRef} className="h-full w-full" />
+        <div key={ytId} ref={containerRef} className="h-full w-full" />
       </div>
       <div className="flex items-center justify-between text-[11px] text-muted-foreground">
-        <span>{ready && resumeAt > 5 ? `Resumed at ${Math.floor(resumeAt / 60)}:${String(Math.floor(resumeAt % 60)).padStart(2, "0")}` : "Smart player"}</span>
+        <span>{ready && resumeAt > 5 ? `Resumed at ${Math.floor(resumeAt / 60)}:${String(Math.floor(resumeAt % 60)).padStart(2, "0")}` : "Smart player · auto-resume on"}</span>
         <span className="hidden md:inline">Shortcuts: Space ⏯ · ← → 5s · J L 10s · M mute · F fullscreen</span>
       </div>
     </div>
   );
 }
+
