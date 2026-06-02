@@ -83,7 +83,9 @@ function Profile() {
   const menuItems = [
     { to: "/my-learning", label: "My Learning", desc: "Continue where you left off", icon: BookOpen },
     { to: "/certificates", label: "Certificates", desc: "Your achievements", icon: Award },
-    { to: "/settings", label: "Settings", desc: "Account & preferences", icon: SettingsIcon },
+    { to: "/achievements", label: "Badges & achievements", desc: "Unlock learning milestones", icon: Sparkles },
+    { to: "/leaderboard", label: "Leaderboard", desc: "See where you rank this week", icon: Flame },
+    { to: "/settings", label: "Settings", desc: "Account, goal & reminders", icon: SettingsIcon },
   ] as const;
 
   return (
