@@ -1,12 +1,14 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { Award, Download, Linkedin, ExternalLink } from "lucide-react";
+import { Award, Download, Linkedin, ExternalLink, Share2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { AppShell } from "@/components/layout/AppShell";
 import { Button } from "@/components/ui/button";
 import { downloadCertificatePdf, linkedInShareUrl } from "@/lib/certificate";
+import { downloadShareCard } from "@/lib/share-card";
+import { checkAchievements } from "@/lib/gamification";
 
 export const Route = createFileRoute("/certificates")({
   head: () => ({ meta: [{ title: "Certificates — SkillWave" }] }),
@@ -17,6 +19,7 @@ function Certs() {
   const { user, loading } = useAuth();
   const nav = useNavigate();
   useEffect(() => { if (!loading && !user) nav({ to: "/login" }); }, [user, loading, nav]);
+  useEffect(() => { if (user) checkAchievements(user.id); }, [user]);
   const certs = useQuery({
     queryKey: ["my-certs", user?.id],
     enabled: !!user,
@@ -48,6 +51,9 @@ function Certs() {
                   <a href={linkedInShareUrl(c)} target="_blank" rel="noreferrer">
                     <Linkedin className="h-3 w-3 mr-1" /> LinkedIn
                   </a>
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => downloadShareCard(c)}>
+                  <Share2 className="h-3 w-3 mr-1" /> Share card
                 </Button>
                 <Button size="sm" variant="ghost" asChild>
                   <Link to="/verify/$id" params={{ id: c.verification_id }}>
