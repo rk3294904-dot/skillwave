@@ -62,7 +62,12 @@ export async function checkAchievements(userId: string) {
       earned.map((a) => ({ user_id: userId, achievement_id: a.id })),
     );
     for (const a of earned) {
-      toast.success(`🏆 ${a.title}`, { description: a.description });
+      if (notifyOn) {
+        toast.success(`🏆 ${a.title}`, { description: a.description });
+        if (typeof Notification !== "undefined" && Notification.permission === "granted") {
+          try { new Notification(`🏆 Achievement unlocked: ${a.title}`, { body: a.description, icon: "/favicon.svg" }); } catch {}
+        }
+      }
       if (a.xp_reward > 0) await awardXP(userId, a.xp_reward, `badge:${a.id}`);
     }
     return earned;
