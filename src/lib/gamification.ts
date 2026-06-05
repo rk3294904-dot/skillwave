@@ -24,7 +24,9 @@ export async function checkAchievements(userId: string) {
       supabase.from("lesson_progress").select("*", { count: "exact", head: true }).eq("user_id", userId).eq("completed", true),
       supabase.from("quiz_attempts").select("*", { count: "exact", head: true }).eq("user_id", userId).eq("passed", true),
       supabase.from("certificates").select("*", { count: "exact", head: true }).eq("user_id", userId),
+      supabase.from("profiles").select("notify_achievement_email").eq("user_id", userId).maybeSingle(),
     ]);
+    const notifyOn = ((prof.data as any)?.notify_achievement_email) !== false;
     const all = (achRes.data ?? []) as unknown as Ach[];
     const have = new Set(((owned.data ?? []) as any[]).map((r) => r.achievement_id));
     const s = stats.data as any;
