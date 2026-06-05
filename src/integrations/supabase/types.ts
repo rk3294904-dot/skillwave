@@ -536,6 +536,8 @@ export type Database = {
           id: string
           interests: string[] | null
           learning_goal: string | null
+          notify_achievement_email: boolean
+          notify_daily_reminder: boolean
           onboarded: boolean
           updated_at: string
           user_id: string
@@ -551,6 +553,8 @@ export type Database = {
           id?: string
           interests?: string[] | null
           learning_goal?: string | null
+          notify_achievement_email?: boolean
+          notify_daily_reminder?: boolean
           onboarded?: boolean
           updated_at?: string
           user_id: string
@@ -566,6 +570,8 @@ export type Database = {
           id?: string
           interests?: string[] | null
           learning_goal?: string | null
+          notify_achievement_email?: boolean
+          notify_daily_reminder?: boolean
           onboarded?: boolean
           updated_at?: string
           user_id?: string

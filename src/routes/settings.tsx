@@ -2,13 +2,13 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Bell, Target } from "lucide-react";
+import { Bell, Target, Mail, Trophy } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { AppShell } from "@/components/layout/AppShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({ meta: [{ title: "Settings — SkillWave" }] }),
@@ -21,6 +21,8 @@ function Settings() {
   const [goal, setGoal] = useState(15);
   const [saving, setSaving] = useState(false);
   const [notifPerm, setNotifPerm] = useState<NotificationPermission>("default");
+  const [notifyDaily, setNotifyDaily] = useState(true);
+  const [notifyAch, setNotifyAch] = useState(true);
 
   useEffect(() => { if (!loading && !user) nav({ to: "/login" }); }, [user, loading, nav]);
   useEffect(() => { if (typeof Notification !== "undefined") setNotifPerm(Notification.permission); }, []);
@@ -28,15 +30,29 @@ function Settings() {
   const profile = useQuery({
     queryKey: ["profile-settings", user?.id],
     enabled: !!user,
-    queryFn: async () => (await supabase.from("profiles").select("daily_goal_minutes").eq("user_id", user!.id).maybeSingle()).data,
+    queryFn: async () => (await supabase.from("profiles").select("daily_goal_minutes, notify_daily_reminder, notify_achievement_email").eq("user_id", user!.id).maybeSingle()).data,
   });
-  useEffect(() => { if (profile.data) setGoal((profile.data as any).daily_goal_minutes ?? 15); }, [profile.data]);
+  useEffect(() => {
+    if (profile.data) {
+      const p = profile.data as any;
+      setGoal(p.daily_goal_minutes ?? 15);
+      setNotifyDaily(p.notify_daily_reminder ?? true);
+      setNotifyAch(p.notify_achievement_email ?? true);
+    }
+  }, [profile.data]);
 
   const saveGoal = async () => {
     setSaving(true);
     const { error } = await supabase.from("profiles").update({ daily_goal_minutes: goal } as any).eq("user_id", user!.id);
     setSaving(false);
     if (error) toast.error(error.message); else toast.success("Daily XP goal updated");
+  };
+
+  const toggleNotify = async (key: "notify_daily_reminder" | "notify_achievement_email", value: boolean) => {
+    if (key === "notify_daily_reminder") setNotifyDaily(value); else setNotifyAch(value);
+    const { error } = await supabase.from("profiles").update({ [key]: value } as any).eq("user_id", user!.id);
+    if (error) toast.error(error.message);
+    else toast.success(value ? "Notifications enabled" : "Notifications disabled");
   };
 
   const askNotif = async () => {
@@ -60,15 +76,31 @@ function Settings() {
           </div>
         </div>
 
-        <div className="rounded-xl border border-border bg-card p-6 space-y-3">
-          <div className="flex items-center gap-2 font-semibold"><Bell className="h-4 w-4 text-primary" /> Learning reminders</div>
-          <p className="text-sm text-muted-foreground">Get a browser notification if you haven't met your daily goal by 7pm.</p>
+        <div className="rounded-xl border border-border bg-card p-6 space-y-4">
+          <div className="flex items-center gap-2 font-semibold"><Bell className="h-4 w-4 text-primary" /> Notifications</div>
+
+          <div className="flex items-start justify-between gap-4 py-2 border-b border-border/50">
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 font-medium text-sm"><Mail className="h-3.5 w-3.5 text-cyan-400" /> Daily learning reminders</div>
+              <p className="text-xs text-muted-foreground mt-1">Get nudged at 7pm if you haven't hit today's XP goal.</p>
+            </div>
+            <Switch checked={notifyDaily} onCheckedChange={(v) => toggleNotify("notify_daily_reminder", v)} />
+          </div>
+
+          <div className="flex items-start justify-between gap-4 py-2">
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 font-medium text-sm"><Trophy className="h-3.5 w-3.5 text-amber-400" /> Achievement unlocks</div>
+              <p className="text-xs text-muted-foreground mt-1">Celebrate when you earn a new badge.</p>
+            </div>
+            <Switch checked={notifyAch} onCheckedChange={(v) => toggleNotify("notify_achievement_email", v)} />
+          </div>
+
           {notifPerm === "granted" ? (
-            <div className="text-sm text-emerald-400">✓ Reminders enabled</div>
+            <div className="text-xs text-emerald-400">✓ Browser notifications enabled</div>
           ) : notifPerm === "denied" ? (
-            <div className="text-sm text-destructive">Blocked — enable notifications in your browser settings.</div>
+            <div className="text-xs text-destructive">Browser notifications blocked — enable in your browser settings.</div>
           ) : (
-            <Button onClick={askNotif} variant="outline">Enable reminders</Button>
+            <Button onClick={askNotif} variant="outline" size="sm">Enable browser notifications</Button>
           )}
         </div>
 

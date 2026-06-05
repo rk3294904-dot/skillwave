@@ -17,14 +17,16 @@ type Ach = {
 
 export async function checkAchievements(userId: string) {
   try {
-    const [achRes, owned, stats, lessonsCount, quizPass, certCount] = await Promise.all([
+    const [achRes, owned, stats, lessonsCount, quizPass, certCount, prof] = await Promise.all([
       supabase.from("achievements" as any).select("*"),
       supabase.from("user_achievements" as any).select("achievement_id").eq("user_id", userId),
       supabase.from("user_stats").select("*").eq("user_id", userId).maybeSingle(),
       supabase.from("lesson_progress").select("*", { count: "exact", head: true }).eq("user_id", userId).eq("completed", true),
       supabase.from("quiz_attempts").select("*", { count: "exact", head: true }).eq("user_id", userId).eq("passed", true),
       supabase.from("certificates").select("*", { count: "exact", head: true }).eq("user_id", userId),
+      supabase.from("profiles").select("notify_achievement_email").eq("user_id", userId).maybeSingle(),
     ]);
+    const notifyOn = ((prof.data as any)?.notify_achievement_email) !== false;
     const all = (achRes.data ?? []) as unknown as Ach[];
     const have = new Set(((owned.data ?? []) as any[]).map((r) => r.achievement_id));
     const s = stats.data as any;
@@ -60,7 +62,12 @@ export async function checkAchievements(userId: string) {
       earned.map((a) => ({ user_id: userId, achievement_id: a.id })),
     );
     for (const a of earned) {
-      toast.success(`🏆 ${a.title}`, { description: a.description });
+      if (notifyOn) {
+        toast.success(`🏆 ${a.title}`, { description: a.description });
+        if (typeof Notification !== "undefined" && Notification.permission === "granted") {
+          try { new Notification(`🏆 Achievement unlocked: ${a.title}`, { body: a.description, icon: "/favicon.svg" }); } catch {}
+        }
+      }
       if (a.xp_reward > 0) await awardXP(userId, a.xp_reward, `badge:${a.id}`);
     }
     return earned;

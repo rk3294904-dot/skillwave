@@ -2,7 +2,8 @@ import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 
-// Schedules a 7pm browser notification if user hasn't met today's XP goal.
+// Schedules a 7pm browser notification if user hasn't met today's XP goal
+// and has the daily-reminder preference enabled.
 export function DailyGoalReminder() {
   const { user } = useAuth();
   useEffect(() => {
@@ -15,8 +16,9 @@ export function DailyGoalReminder() {
       const since = new Date(); since.setHours(0, 0, 0, 0);
       const [{ data: events }, { data: prof }] = await Promise.all([
         supabase.from("xp_events" as any).select("delta").eq("user_id", user.id).gte("created_at", since.toISOString()),
-        supabase.from("profiles").select("daily_goal_minutes").eq("user_id", user.id).maybeSingle(),
+        supabase.from("profiles").select("daily_goal_minutes, notify_daily_reminder").eq("user_id", user.id).maybeSingle(),
       ]);
+      if ((prof as any)?.notify_daily_reminder === false) return;
       const today = ((events ?? []) as any[]).reduce((s, e) => s + (e.delta ?? 0), 0);
       const goal = ((prof as any)?.daily_goal_minutes ?? 15);
       if (today < goal) {
