@@ -17,7 +17,7 @@ type Ach = {
 
 export async function checkAchievements(userId: string) {
   try {
-    const [achRes, owned, stats, lessonsCount, quizPass, certCount] = await Promise.all([
+    const [achRes, owned, stats, lessonsCount, quizPass, certCount, prof] = await Promise.all([
       supabase.from("achievements" as any).select("*"),
       supabase.from("user_achievements" as any).select("achievement_id").eq("user_id", userId),
       supabase.from("user_stats").select("*").eq("user_id", userId).maybeSingle(),
