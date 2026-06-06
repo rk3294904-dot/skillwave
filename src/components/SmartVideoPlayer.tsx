@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toEmbedUrl } from "@/lib/embed";
+import { parseTelegramUrl, telegramStreamUrl, telegramPublicEmbed } from "@/lib/telegram-url";
 
 type Props = {
   url: string;
