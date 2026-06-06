@@ -664,6 +664,57 @@ export type Database = {
         }
         Relationships: []
       }
+      telegram_videos: {
+        Row: {
+          caption: string | null
+          chat_id: number
+          created_at: string
+          duration: number | null
+          file_id: string
+          file_size: number | null
+          file_unique_id: string | null
+          height: number | null
+          id: string
+          message_id: number
+          mime_type: string | null
+          thumbnail_file_id: string | null
+          updated_at: string
+          width: number | null
+        }
+        Insert: {
+          caption?: string | null
+          chat_id: number
+          created_at?: string
+          duration?: number | null
+          file_id: string
+          file_size?: number | null
+          file_unique_id?: string | null
+          height?: number | null
+          id?: string
+          message_id: number
+          mime_type?: string | null
+          thumbnail_file_id?: string | null
+          updated_at?: string
+          width?: number | null
+        }
+        Update: {
+          caption?: string | null
+          chat_id?: number
+          created_at?: string
+          duration?: number | null
+          file_id?: string
+          file_size?: number | null
+          file_unique_id?: string | null
+          height?: number | null
+          id?: string
+          message_id?: number
+          mime_type?: string | null
+          thumbnail_file_id?: string | null
+          updated_at?: string
+          width?: number | null
+        }
+        Relationships: []
+      }
       user_achievements: {
         Row: {
           achievement_id: string

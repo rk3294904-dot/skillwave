@@ -152,7 +152,7 @@ function CurriculumEditor() {
             <div><Label>Title</Label><Input value={lf.title} onChange={(e) => setLf({ ...lf, title: e.target.value })} /></div>
             <div><Label>Description</Label><Input value={lf.description ?? ""} onChange={(e) => setLf({ ...lf, description: e.target.value })} /></div>
             <div className="grid grid-cols-2 gap-3">
-              <div><Label>Video URL (YouTube or Google Drive)</Label><Input value={lf.video_url ?? ""} onChange={(e) => setLf({ ...lf, video_url: e.target.value })} /></div>
+              <div><Label>Video URL</Label><Input value={lf.video_url ?? ""} onChange={(e) => setLf({ ...lf, video_url: e.target.value })} placeholder="YouTube / Drive / https://t.me/c/.../9" /></div>
               <div><Label>Provider</Label>
                 <Select value={lf.video_provider ?? "youtube"} onValueChange={(v) => setLf({ ...lf, video_provider: v })}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
@@ -160,10 +160,12 @@ function CurriculumEditor() {
                     <SelectItem value="youtube">YouTube</SelectItem>
                     <SelectItem value="google_drive">Google Drive</SelectItem>
                     <SelectItem value="vimeo">Vimeo</SelectItem>
+                    <SelectItem value="telegram">Telegram channel</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
+            <TelegramLinkChecker url={lf.video_url ?? ""} />
             <div className="grid grid-cols-2 gap-3">
               <div><Label>Duration (min)</Label><Input type="number" value={lf.duration_minutes ?? 0} onChange={(e) => setLf({ ...lf, duration_minutes: e.target.value })} /></div>
               <label className="flex items-end gap-2 pb-2"><Switch checked={!!lf.is_preview} onCheckedChange={(v) => setLf({ ...lf, is_preview: v })} /> Free preview</label>
@@ -191,6 +193,50 @@ function CurriculumEditor() {
           </div>
         </DialogContent>
       </Dialog>
+    </div>
+  );
+}
+
+function TelegramLinkChecker({ url }: { url: string }) {
+  const [state, setState] = useState<{ status: "idle" | "checking" | "ok" | "missing" | "invalid"; info?: any }>({ status: "idle" });
+  const parsed = (() => {
+    try {
+      const u = new URL(url);
+      if (!/(^|\.)t\.me$/.test(u.hostname)) return null;
+      const p = u.pathname.split("/").filter(Boolean);
+      if (p[0] === "c" && p.length >= 3) return { chat: p[1], msg: p[2], kind: "private" as const };
+      if (p.length >= 2) return { user: p[0], msg: p[1], kind: "public" as const };
+      return null;
+    } catch { return null; }
+  })();
+
+  if (!url || !parsed) return null;
+
+  return (
+    <div className="rounded-md border border-border bg-muted/30 p-3 text-xs space-y-2">
+      <div className="flex items-center justify-between">
+        <span className="font-medium">Telegram link detected{parsed.kind === "public" ? " (public)" : ""}</span>
+        {parsed.kind === "private" && (
+          <Button size="sm" variant="outline"
+            onClick={async () => {
+              setState({ status: "checking" });
+              const r = await fetch(`/api/public/telegram/check/${parsed.chat}/${parsed.msg}`);
+              const j = await r.json();
+              setState(j.found ? { status: "ok", info: j } : { status: "missing" });
+            }}>
+            {state.status === "checking" ? "Checking…" : "Check video"}
+          </Button>
+        )}
+      </div>
+      {parsed.kind === "public" && (
+        <p className="text-muted-foreground">Public channels embed automatically via Telegram's widget — no bot needed.</p>
+      )}
+      {parsed.kind === "private" && state.status === "ok" && (
+        <p className="text-green-500">✓ Video found — {state.info.duration}s · {state.info.width}×{state.info.height} · {state.info.mime_type}</p>
+      )}
+      {parsed.kind === "private" && state.status === "missing" && (
+        <p className="text-amber-500">⚠ Not received yet. Confirm the bot is an <strong>admin</strong> of channel <code>{parsed.chat}</code> and the post was made <strong>after</strong> adding it. Old posts must be forwarded to the bot.</p>
+      )}
     </div>
   );
 }

@@ -40,6 +40,9 @@ import { Route as AdminCertificatesRouteImport } from './routes/admin.certificat
 import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
 import { Route as AdminCoursesIndexRouteImport } from './routes/admin.courses.index'
 import { Route as AdminCoursesIdRouteImport } from './routes/admin.courses.$id'
+import { Route as ApiPublicTelegramWebhookRouteImport } from './routes/api/public/telegram/webhook'
+import { Route as ApiPublicTelegramVideoChatMsgRouteImport } from './routes/api/public/telegram/video.$chat.$msg'
+import { Route as ApiPublicTelegramCheckChatMsgRouteImport } from './routes/api/public/telegram/check.$chat.$msg'
 
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
@@ -196,6 +199,24 @@ const AdminCoursesIdRoute = AdminCoursesIdRouteImport.update({
   path: '/courses/$id',
   getParentRoute: () => AdminRoute,
 } as any)
+const ApiPublicTelegramWebhookRoute =
+  ApiPublicTelegramWebhookRouteImport.update({
+    id: '/api/public/telegram/webhook',
+    path: '/api/public/telegram/webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicTelegramVideoChatMsgRoute =
+  ApiPublicTelegramVideoChatMsgRouteImport.update({
+    id: '/api/public/telegram/video/$chat/$msg',
+    path: '/api/public/telegram/video/$chat/$msg',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicTelegramCheckChatMsgRoute =
+  ApiPublicTelegramCheckChatMsgRouteImport.update({
+    id: '/api/public/telegram/check/$chat/$msg',
+    path: '/api/public/telegram/check/$chat/$msg',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -229,6 +250,9 @@ export interface FileRoutesByFullPath {
   '/categories/': typeof CategoriesIndexRoute
   '/admin/courses/$id': typeof AdminCoursesIdRoute
   '/admin/courses/': typeof AdminCoursesIndexRoute
+  '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
+  '/api/public/telegram/check/$chat/$msg': typeof ApiPublicTelegramCheckChatMsgRoute
+  '/api/public/telegram/video/$chat/$msg': typeof ApiPublicTelegramVideoChatMsgRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -261,6 +285,9 @@ export interface FileRoutesByTo {
   '/categories': typeof CategoriesIndexRoute
   '/admin/courses/$id': typeof AdminCoursesIdRoute
   '/admin/courses': typeof AdminCoursesIndexRoute
+  '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
+  '/api/public/telegram/check/$chat/$msg': typeof ApiPublicTelegramCheckChatMsgRoute
+  '/api/public/telegram/video/$chat/$msg': typeof ApiPublicTelegramVideoChatMsgRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -295,6 +322,9 @@ export interface FileRoutesById {
   '/categories/': typeof CategoriesIndexRoute
   '/admin/courses/$id': typeof AdminCoursesIdRoute
   '/admin/courses/': typeof AdminCoursesIndexRoute
+  '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
+  '/api/public/telegram/check/$chat/$msg': typeof ApiPublicTelegramCheckChatMsgRoute
+  '/api/public/telegram/video/$chat/$msg': typeof ApiPublicTelegramVideoChatMsgRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -330,6 +360,9 @@ export interface FileRouteTypes {
     | '/categories/'
     | '/admin/courses/$id'
     | '/admin/courses/'
+    | '/api/public/telegram/webhook'
+    | '/api/public/telegram/check/$chat/$msg'
+    | '/api/public/telegram/video/$chat/$msg'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -362,6 +395,9 @@ export interface FileRouteTypes {
     | '/categories'
     | '/admin/courses/$id'
     | '/admin/courses'
+    | '/api/public/telegram/webhook'
+    | '/api/public/telegram/check/$chat/$msg'
+    | '/api/public/telegram/video/$chat/$msg'
   id:
     | '__root__'
     | '/'
@@ -395,6 +431,9 @@ export interface FileRouteTypes {
     | '/categories/'
     | '/admin/courses/$id'
     | '/admin/courses/'
+    | '/api/public/telegram/webhook'
+    | '/api/public/telegram/check/$chat/$msg'
+    | '/api/public/telegram/video/$chat/$msg'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -421,6 +460,9 @@ export interface RootRouteChildren {
   LearnCourseIdRoute: typeof LearnCourseIdRoute
   VerifyIdRoute: typeof VerifyIdRoute
   CategoriesIndexRoute: typeof CategoriesIndexRoute
+  ApiPublicTelegramWebhookRoute: typeof ApiPublicTelegramWebhookRoute
+  ApiPublicTelegramCheckChatMsgRoute: typeof ApiPublicTelegramCheckChatMsgRoute
+  ApiPublicTelegramVideoChatMsgRoute: typeof ApiPublicTelegramVideoChatMsgRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -642,6 +684,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCoursesIdRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/api/public/telegram/webhook': {
+      id: '/api/public/telegram/webhook'
+      path: '/api/public/telegram/webhook'
+      fullPath: '/api/public/telegram/webhook'
+      preLoaderRoute: typeof ApiPublicTelegramWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/telegram/video/$chat/$msg': {
+      id: '/api/public/telegram/video/$chat/$msg'
+      path: '/api/public/telegram/video/$chat/$msg'
+      fullPath: '/api/public/telegram/video/$chat/$msg'
+      preLoaderRoute: typeof ApiPublicTelegramVideoChatMsgRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/telegram/check/$chat/$msg': {
+      id: '/api/public/telegram/check/$chat/$msg'
+      path: '/api/public/telegram/check/$chat/$msg'
+      fullPath: '/api/public/telegram/check/$chat/$msg'
+      preLoaderRoute: typeof ApiPublicTelegramCheckChatMsgRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -693,17 +756,10 @@ const rootRouteChildren: RootRouteChildren = {
   LearnCourseIdRoute: LearnCourseIdRoute,
   VerifyIdRoute: VerifyIdRoute,
   CategoriesIndexRoute: CategoriesIndexRoute,
+  ApiPublicTelegramWebhookRoute: ApiPublicTelegramWebhookRoute,
+  ApiPublicTelegramCheckChatMsgRoute: ApiPublicTelegramCheckChatMsgRoute,
+  ApiPublicTelegramVideoChatMsgRoute: ApiPublicTelegramVideoChatMsgRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
