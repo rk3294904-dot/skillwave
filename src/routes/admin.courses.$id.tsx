@@ -152,7 +152,7 @@ function CurriculumEditor() {
             <div><Label>Title</Label><Input value={lf.title} onChange={(e) => setLf({ ...lf, title: e.target.value })} /></div>
             <div><Label>Description</Label><Input value={lf.description ?? ""} onChange={(e) => setLf({ ...lf, description: e.target.value })} /></div>
             <div className="grid grid-cols-2 gap-3">
-              <div><Label>Video URL (YouTube or Google Drive)</Label><Input value={lf.video_url ?? ""} onChange={(e) => setLf({ ...lf, video_url: e.target.value })} /></div>
+              <div><Label>Video URL</Label><Input value={lf.video_url ?? ""} onChange={(e) => setLf({ ...lf, video_url: e.target.value })} placeholder="YouTube / Drive / https://t.me/c/.../9" /></div>
               <div><Label>Provider</Label>
                 <Select value={lf.video_provider ?? "youtube"} onValueChange={(v) => setLf({ ...lf, video_provider: v })}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
@@ -160,10 +160,12 @@ function CurriculumEditor() {
                     <SelectItem value="youtube">YouTube</SelectItem>
                     <SelectItem value="google_drive">Google Drive</SelectItem>
                     <SelectItem value="vimeo">Vimeo</SelectItem>
+                    <SelectItem value="telegram">Telegram channel</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
+            <TelegramLinkChecker url={lf.video_url ?? ""} />
             <div className="grid grid-cols-2 gap-3">
               <div><Label>Duration (min)</Label><Input type="number" value={lf.duration_minutes ?? 0} onChange={(e) => setLf({ ...lf, duration_minutes: e.target.value })} /></div>
               <label className="flex items-end gap-2 pb-2"><Switch checked={!!lf.is_preview} onCheckedChange={(v) => setLf({ ...lf, is_preview: v })} /> Free preview</label>
