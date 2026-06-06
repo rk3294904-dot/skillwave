@@ -112,6 +112,36 @@ export function SmartVideoPlayer({ url, provider, title, userId, courseId, lesso
   }, [ytId, lessonId, userId, resumeAt]);
 
   if (!ytId) {
+    // Telegram: private channel → stream via our proxy as native <video>
+    const tg = parseTelegramUrl(url);
+    if (tg?.kind === "private") {
+      const stream = telegramStreamUrl(url)!;
+      return (
+        <div className="space-y-2">
+          <div className="aspect-video w-full overflow-hidden rounded-lg border border-border bg-black shadow-glow">
+            <video
+              src={stream}
+              controls
+              playsInline
+              controlsList="nodownload"
+              className="h-full w-full"
+              title={title ?? "Lesson video"}
+            />
+          </div>
+          <div className="text-[11px] text-muted-foreground">Streaming from Telegram channel · post #{tg.msg}</div>
+        </div>
+      );
+    }
+    // Telegram: public channel → official embed widget
+    const tgEmbed = telegramPublicEmbed(url);
+    if (tgEmbed) {
+      return (
+        <div className="aspect-video w-full overflow-hidden rounded-lg border border-border bg-black shadow-glow">
+          <iframe src={tgEmbed} title={title ?? "Lesson video"} className="h-full w-full" allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen />
+        </div>
+      );
+    }
+
     const src = toEmbedUrl(url, provider);
     if (!src) return <div className="aspect-video grid place-items-center bg-muted rounded-lg text-muted-foreground">No video</div>;
     return (
