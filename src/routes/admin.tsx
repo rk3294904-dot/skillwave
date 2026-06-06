@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { LayoutDashboard, BookOpen, FolderTree, Users, Award, MessagesSquare, Settings as SettingsIcon } from "lucide-react";
+import { LayoutDashboard, BookOpen, FolderTree, Users, Award, MessagesSquare, Settings as SettingsIcon, Send } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { TopNav } from "@/components/layout/TopNav";
 import { MobileNav } from "@/components/layout/MobileNav";
@@ -12,8 +12,10 @@ const tabs: ReadonlyArray<{ to: string; label: string; icon: typeof LayoutDashbo
   { to: "/admin/users", label: "Users", icon: Users },
   { to: "/admin/certificates", label: "Certificates", icon: Award },
   { to: "/admin/reviews", label: "Reviews", icon: MessagesSquare },
+  { to: "/admin/telegram", label: "Telegram", icon: Send },
   { to: "/admin/settings", label: "Settings", icon: SettingsIcon },
 ];
+
 
 export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [{ title: "Admin — SkillWave" }] }),
