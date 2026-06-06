@@ -34,6 +34,7 @@ import { Route as LearnCourseIdRouteImport } from './routes/learn.$courseId'
 import { Route as CourseSlugRouteImport } from './routes/course.$slug'
 import { Route as CategoriesSlugRouteImport } from './routes/categories.$slug'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
+import { Route as AdminTelegramRouteImport } from './routes/admin.telegram'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminReviewsRouteImport } from './routes/admin.reviews'
 import { Route as AdminCertificatesRouteImport } from './routes/admin.certificates'
@@ -169,6 +170,11 @@ const AdminUsersRoute = AdminUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminTelegramRoute = AdminTelegramRouteImport.update({
+  id: '/telegram',
+  path: '/telegram',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminSettingsRoute = AdminSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -241,6 +247,7 @@ export interface FileRoutesByFullPath {
   '/admin/certificates': typeof AdminCertificatesRoute
   '/admin/reviews': typeof AdminReviewsRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/telegram': typeof AdminTelegramRoute
   '/admin/users': typeof AdminUsersRoute
   '/categories/$slug': typeof CategoriesSlugRoute
   '/course/$slug': typeof CourseSlugRoute
@@ -276,6 +283,7 @@ export interface FileRoutesByTo {
   '/admin/certificates': typeof AdminCertificatesRoute
   '/admin/reviews': typeof AdminReviewsRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/telegram': typeof AdminTelegramRoute
   '/admin/users': typeof AdminUsersRoute
   '/categories/$slug': typeof CategoriesSlugRoute
   '/course/$slug': typeof CourseSlugRoute
@@ -313,6 +321,7 @@ export interface FileRoutesById {
   '/admin/certificates': typeof AdminCertificatesRoute
   '/admin/reviews': typeof AdminReviewsRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/telegram': typeof AdminTelegramRoute
   '/admin/users': typeof AdminUsersRoute
   '/categories/$slug': typeof CategoriesSlugRoute
   '/course/$slug': typeof CourseSlugRoute
@@ -351,6 +360,7 @@ export interface FileRouteTypes {
     | '/admin/certificates'
     | '/admin/reviews'
     | '/admin/settings'
+    | '/admin/telegram'
     | '/admin/users'
     | '/categories/$slug'
     | '/course/$slug'
@@ -386,6 +396,7 @@ export interface FileRouteTypes {
     | '/admin/certificates'
     | '/admin/reviews'
     | '/admin/settings'
+    | '/admin/telegram'
     | '/admin/users'
     | '/categories/$slug'
     | '/course/$slug'
@@ -422,6 +433,7 @@ export interface FileRouteTypes {
     | '/admin/certificates'
     | '/admin/reviews'
     | '/admin/settings'
+    | '/admin/telegram'
     | '/admin/users'
     | '/categories/$slug'
     | '/course/$slug'
@@ -642,6 +654,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUsersRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/telegram': {
+      id: '/admin/telegram'
+      path: '/telegram'
+      fullPath: '/admin/telegram'
+      preLoaderRoute: typeof AdminTelegramRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/settings': {
       id: '/admin/settings'
       path: '/settings'
@@ -713,6 +732,7 @@ interface AdminRouteChildren {
   AdminCertificatesRoute: typeof AdminCertificatesRoute
   AdminReviewsRoute: typeof AdminReviewsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminTelegramRoute: typeof AdminTelegramRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminCoursesIdRoute: typeof AdminCoursesIdRoute
@@ -724,6 +744,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminCertificatesRoute: AdminCertificatesRoute,
   AdminReviewsRoute: AdminReviewsRoute,
   AdminSettingsRoute: AdminSettingsRoute,
+  AdminTelegramRoute: AdminTelegramRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminCoursesIdRoute: AdminCoursesIdRoute,
