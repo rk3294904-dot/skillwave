@@ -196,3 +196,47 @@ function CurriculumEditor() {
     </div>
   );
 }
+
+function TelegramLinkChecker({ url }: { url: string }) {
+  const [state, setState] = useState<{ status: "idle" | "checking" | "ok" | "missing" | "invalid"; info?: any }>({ status: "idle" });
+  const parsed = (() => {
+    try {
+      const u = new URL(url);
+      if (!/(^|\.)t\.me$/.test(u.hostname)) return null;
+      const p = u.pathname.split("/").filter(Boolean);
+      if (p[0] === "c" && p.length >= 3) return { chat: p[1], msg: p[2], kind: "private" as const };
+      if (p.length >= 2) return { user: p[0], msg: p[1], kind: "public" as const };
+      return null;
+    } catch { return null; }
+  })();
+
+  if (!url || !parsed) return null;
+
+  return (
+    <div className="rounded-md border border-border bg-muted/30 p-3 text-xs space-y-2">
+      <div className="flex items-center justify-between">
+        <span className="font-medium">Telegram link detected{parsed.kind === "public" ? " (public)" : ""}</span>
+        {parsed.kind === "private" && (
+          <Button size="sm" variant="outline"
+            onClick={async () => {
+              setState({ status: "checking" });
+              const r = await fetch(`/api/public/telegram/check/${parsed.chat}/${parsed.msg}`);
+              const j = await r.json();
+              setState(j.found ? { status: "ok", info: j } : { status: "missing" });
+            }}>
+            {state.status === "checking" ? "Checking…" : "Check video"}
+          </Button>
+        )}
+      </div>
+      {parsed.kind === "public" && (
+        <p className="text-muted-foreground">Public channels embed automatically via Telegram's widget — no bot needed.</p>
+      )}
+      {parsed.kind === "private" && state.status === "ok" && (
+        <p className="text-green-500">✓ Video found — {state.info.duration}s · {state.info.width}×{state.info.height} · {state.info.mime_type}</p>
+      )}
+      {parsed.kind === "private" && state.status === "missing" && (
+        <p className="text-amber-500">⚠ Not received yet. Confirm the bot is an <strong>admin</strong> of channel <code>{parsed.chat}</code> and the post was made <strong>after</strong> adding it. Old posts must be forwarded to the bot.</p>
+      )}
+    </div>
+  );
+}
