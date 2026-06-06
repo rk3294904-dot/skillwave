@@ -23,8 +23,7 @@ export const Route = createFileRoute("/api/public/telegram/video/$chat/$msg")({
         const candidates = chatNum < 0 ? [chatNum] : [chatNum, Number(`-100${chatNum}`)];
         let row: any = null;
         for (const c of candidates) {
-          const r = await sb()
-            .from("telegram_videos")
+          const r = await (sb().from("telegram_videos" as any) as any)
             .select("file_id, mime_type")
             .eq("chat_id", c)
             .eq("message_id", msgNum)

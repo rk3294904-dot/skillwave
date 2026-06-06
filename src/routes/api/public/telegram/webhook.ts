@@ -46,8 +46,7 @@ export const Route = createFileRoute("/api/public/telegram/webhook")({
           return Response.json({ ok: true, skipped: true });
         }
 
-        const { error } = await sb()
-          .from("telegram_videos")
+        const { error } = await (sb().from("telegram_videos" as any) as any)
           .upsert(
             {
               chat_id: msg.chat.id,

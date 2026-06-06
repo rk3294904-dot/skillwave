@@ -18,13 +18,12 @@ export const Route = createFileRoute("/api/public/telegram/check/$chat/$msg")({
         }
         const candidates = chatNum < 0 ? [chatNum] : [chatNum, Number(`-100${chatNum}`)];
         for (const c of candidates) {
-          const r = await sb()
-            .from("telegram_videos")
+          const r = await (sb().from("telegram_videos" as any) as any)
             .select("duration, width, height, mime_type, caption")
             .eq("chat_id", c)
             .eq("message_id", msgNum)
             .maybeSingle();
-          if (r.data) return Response.json({ found: true, ...r.data });
+          if (r.data) return Response.json({ found: true, ...(r.data as object) });
         }
         return Response.json({ found: false });
       },
