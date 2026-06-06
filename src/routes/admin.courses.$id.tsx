@@ -220,9 +220,17 @@ function TelegramLinkChecker({ url }: { url: string }) {
           <Button size="sm" variant="outline"
             onClick={async () => {
               setState({ status: "checking" });
-              const r = await fetch(`/api/public/telegram/check/${parsed.chat}/${parsed.msg}`);
-              const j = await r.json();
-              setState(j.found ? { status: "ok", info: j } : { status: "missing" });
+              try {
+                const r = await fetch(`/api/public/telegram/check/${parsed.chat}/${parsed.msg}`);
+                if (!r.ok) {
+                  setState({ status: "invalid", info: { error: `HTTP ${r.status}` } });
+                  return;
+                }
+                const j = await r.json();
+                setState(j.found ? { status: "ok", info: j } : { status: "missing" });
+              } catch (e: any) {
+                setState({ status: "invalid", info: { error: e?.message ?? "Network error" } });
+              }
             }}>
             {state.status === "checking" ? "Checking…" : "Check video"}
           </Button>
@@ -235,8 +243,12 @@ function TelegramLinkChecker({ url }: { url: string }) {
         <p className="text-green-500">✓ Video found — {state.info.duration}s · {state.info.width}×{state.info.height} · {state.info.mime_type}</p>
       )}
       {parsed.kind === "private" && state.status === "missing" && (
-        <p className="text-amber-500">⚠ Not received yet. Confirm the bot is an <strong>admin</strong> of channel <code>{parsed.chat}</code> and the post was made <strong>after</strong> adding it. Old posts must be forwarded to the bot.</p>
+        <p className="text-amber-500">⚠ Not indexed. Either (a) post was made before the bot was added, or (b) it's not a video. Use the <strong>Backfill</strong> tool in Admin → Telegram to import older posts.</p>
+      )}
+      {parsed.kind === "private" && state.status === "invalid" && (
+        <p className="text-red-500">Check failed: {state.info?.error}</p>
       )}
     </div>
   );
 }
+
